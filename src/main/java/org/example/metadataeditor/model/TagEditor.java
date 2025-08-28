@@ -9,8 +9,11 @@ import java.util.List;
 public class TagEditor {
   private String filePath;
   public Mp3File mp3File;
-  private String sourceDirectory = "C:\\Users\\nguye\\Downloads";
-  private String targetFolder = "\\NewSong";
+  
+  public FileHandler fileHandler;
+  
+  private String sourceDirectory; // = "C:\\Users\\nguye\\Downloads";
+  private String targetFolder; // = "\\NewSong";
 
   private final List<ModelObserver> modelObserverArrayList = new ArrayList<>();
 
@@ -20,7 +23,11 @@ public class TagEditor {
     ALBUM
   }
 
-  public TagEditor(String filePath) {
+  public TagEditor(String filePath, FileHandler fileHandler) {
+    this.fileHandler = fileHandler;
+    sourceDirectory = fileHandler.getPathString(FileHandler.PathType.SOURCE);
+    targetFolder = fileHandler.getPathString(FileHandler.PathType.TARGET);
+    
     if (filePath == null) {
       this.filePath = null;
       mp3File = null;
@@ -51,12 +58,12 @@ public class TagEditor {
     }
     notify(this);
   }
-
+  
   @SuppressWarnings("ResultOfMethodCallIgnored")
   public void saveTags() {
     StringBuilder tempFileName = new StringBuilder(filePath);
     try {
-      File tempFile = new File(sourceDirectory + targetFolder);
+      File tempFile = new File(targetFolder);
       if (!tempFile.exists()) {
         tempFile.mkdir();
       }
@@ -64,6 +71,7 @@ public class TagEditor {
       //      System.out.println(tempFileName.toString());
       mp3File.save(tempFileName.toString());
     } catch (Exception e) {
+      e.printStackTrace();
       throw new RuntimeException("Error saving updated tags.");
     }
   }

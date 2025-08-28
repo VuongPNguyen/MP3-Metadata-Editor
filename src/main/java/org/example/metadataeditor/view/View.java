@@ -10,6 +10,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.example.metadataeditor.controller.Controller;
+import org.example.metadataeditor.model.FileHandler;
 import org.example.metadataeditor.model.ModelObserver;
 import org.example.metadataeditor.model.TagEditor;
 
@@ -35,7 +36,8 @@ public class View implements FXComponent, ModelObserver {
   public Parent render() {
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Open Files");
-    fileChooser.setInitialDirectory(new File("C:\\Users\\nguye\\Downloads"));
+//    fileChooser.setInitialDirectory(new File("C:\\Users\\nguye\\Downloads"));
+    fileChooser.setInitialDirectory(new File(tagEditor.fileHandler.getPathString(FileHandler.PathType.SOURCE)));
 
     fileChooser
         .getExtensionFilters()
