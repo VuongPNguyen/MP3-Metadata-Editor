@@ -1,6 +1,9 @@
 package org.example.metadataeditor.model;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,26 +11,27 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class FileHandler {
-  private File userDirectoryFile;
+  private final Path appDirectory;
+  private final String jsonName = "userDirectoryDesignation.json";
   
   public FileHandler() {
     // Gets user home directory and concatenates a path for app.
     String userHomeDir = System.getProperty("user.home");
-    Path appDir = Paths.get(userHomeDir, "MP3-Metadata-Editor");
+    appDirectory = Paths.get(userHomeDir, "MP3-Metadata-Editor");
 
     // Tries to create folder for app.
     try {
-      Files.createDirectories(appDir);
+      Files.createDirectories(appDirectory);
     } catch (IOException ioe) {
       throw new RuntimeException("Error creating app directory.");
     }
 
-    createPathDataFiles(appDir);
+    createPathDataFiles(appDirectory);
   }
 
   public void createPathDataFiles(Path appDir) {
     // Create file to store source and target files.
-    Path directoryDataFilePath = appDir.resolve("userDirectoryDesignation.json");
+    Path directoryDataFilePath = appDir.resolve(jsonName);
     boolean fileExists = false;
     if (Files.exists(directoryDataFilePath)) {
       System.out.println("File already exists.");
@@ -52,7 +56,7 @@ public class FileHandler {
           new UserDirectories(defaultSourceDir.toString(), defaultTargetDir.toString());
       try {
         ObjectMapper objectMapper = new ObjectMapper();
-        userDirectoryFile = directoryDataFilePath.toFile();
+        File userDirectoryFile = directoryDataFilePath.toFile();
         objectMapper.writeValue(userDirectoryFile, userDirectories);
       } catch (IOException e) {
         throw new RuntimeException(
@@ -65,6 +69,7 @@ public class FileHandler {
     private String source;
     private String target;
 
+    @SuppressWarnings("unused")
     public UserDirectories() {}
 
     public UserDirectories(String source, String target) {
@@ -76,6 +81,7 @@ public class FileHandler {
       return source;
     }
 
+    @SuppressWarnings("unused")
     public void setSource(String source) {
       this.source = source;
     }
@@ -84,6 +90,7 @@ public class FileHandler {
       return target;
     }
 
+    @SuppressWarnings("unused")
     public void setTarget(String target) {
       this.target = target;
     }
@@ -95,15 +102,13 @@ public class FileHandler {
   }
 
   public String getPathString(PathType pathType) {
+    // Setup path to JSON.
     ObjectMapper objectMapper = new ObjectMapper();
-    String userHomeDir = System.getProperty("user.home");
-    Path appDir = Paths.get(userHomeDir, "MP3-Metadata-Editor");
-    Path directoryDataFilePath = appDir.resolve("userDirectoryDesignation.json");
+    Path directoryDataFilePath = appDirectory.resolve(jsonName);
     
     File file = directoryDataFilePath.toFile();
     
     UserDirectories userDirectories;
-    // Read JSON into a Map.
     try {
       userDirectories = objectMapper.readValue(file, objectMapper.constructType(UserDirectories.class));
     } catch (IOException e) {
@@ -121,7 +126,25 @@ public class FileHandler {
     return null;
   }
   
-  public File getUserDirectoryFile() {
-    return userDirectoryFile;
+  public void setDirectory (PathType pathType, String directory) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    File jsonFile = appDirectory.resolve(jsonName).toFile();
+
+    try {
+      JsonNode rootNode = objectMapper.readTree(jsonFile);
+
+      if (rootNode instanceof ObjectNode) {
+        String attribute = "";
+        switch (pathType) {
+          case SOURCE -> attribute = "source";
+          case TARGET -> attribute = "target";
+        }
+        ((ObjectNode) rootNode).put(attribute, directory);
+      }
+
+      objectMapper.writerWithDefaultPrettyPrinter().writeValue(jsonFile, rootNode);
+    } catch (IOException e) {
+      throw new RuntimeException("Exception whilst reading json tree.");
+    }
   }
 }

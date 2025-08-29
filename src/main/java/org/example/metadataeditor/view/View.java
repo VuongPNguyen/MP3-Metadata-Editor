@@ -7,7 +7,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.example.metadataeditor.controller.Controller;
 import org.example.metadataeditor.model.FileHandler;
@@ -35,9 +37,8 @@ public class View implements FXComponent, ModelObserver {
   @Override
   public Parent render() {
     FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle("Open Files");
-//    fileChooser.setInitialDirectory(new File("C:\\Users\\nguye\\Downloads"));
-    fileChooser.setInitialDirectory(new File(tagEditor.fileHandler.getPathString(FileHandler.PathType.SOURCE)));
+    fileChooser.setTitle("Open File");
+    fileChooser.setInitialDirectory(new File(tagEditor.getPathString(FileHandler.PathType.SOURCE)));
 
     fileChooser
         .getExtensionFilters()
@@ -45,8 +46,14 @@ public class View implements FXComponent, ModelObserver {
 
     // ----------------------------------
 
+    DirectoryChooser directoryChooser = new DirectoryChooser();
+    directoryChooser.setTitle("Select Directory");
+    directoryChooser.setInitialDirectory(new File(tagEditor.getPathString(FileHandler.PathType.SOURCE)));
+
+    // ----------------------------------
+
     StackPane stackPane = new StackPane();
-    stackPane.setPrefSize(400, 200);
+    stackPane.setPrefSize(Screen.getPrimary().getVisualBounds().getWidth() / 2.5, 365);
 
     Button newFileButton = new Button("New Song");
     newFileButton.setOnAction(
@@ -75,6 +82,7 @@ public class View implements FXComponent, ModelObserver {
         });
 
     VBox vBox = new VBox();
+    vBox.getChildren().add(new DirectoryButtons(directoryChooser, tagEditor, stage).render());
     vBox.getChildren().add(newFileButton);
     vBox.getChildren().add(new QuickFillButtons(controller).render());
     vBox.getChildren().add(songFields.render());

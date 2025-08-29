@@ -1,6 +1,5 @@
 package org.example.metadataeditor;
 
-import java.io.IOException;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.example.metadataeditor.controller.Controller;
@@ -10,7 +9,7 @@ import org.example.metadataeditor.view.*;
 
 public class Application extends javafx.application.Application {
   @Override
-  public void start(Stage stage) throws IOException {
+  public void start(Stage stage) {
     //    FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("hello-view.fxml"));
     //    Scene scene = new Scene(fxmlLoader.load(), 320, 240);
     

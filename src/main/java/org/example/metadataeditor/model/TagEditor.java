@@ -12,8 +12,8 @@ public class TagEditor {
   
   public FileHandler fileHandler;
   
-  private String sourceDirectory; // = "C:\\Users\\nguye\\Downloads";
-  private String targetFolder; // = "\\NewSong";
+  private final String sourceDirectory;
+  private final String targetFolder;
 
   private final List<ModelObserver> modelObserverArrayList = new ArrayList<>();
 
@@ -58,6 +58,15 @@ public class TagEditor {
     }
     notify(this);
   }
+
+  public void setDirectory(FileHandler.PathType pathType, String path) {
+    fileHandler.setDirectory(pathType, path);
+    notify(this);
+  }
+
+  public String getPathString(FileHandler.PathType pathType) {
+    return fileHandler.getPathString(pathType);
+  }
   
   @SuppressWarnings("ResultOfMethodCallIgnored")
   public void saveTags() {
@@ -71,7 +80,6 @@ public class TagEditor {
       //      System.out.println(tempFileName.toString());
       mp3File.save(tempFileName.toString());
     } catch (Exception e) {
-      e.printStackTrace();
       throw new RuntimeException("Error saving updated tags.");
     }
   }
@@ -245,6 +253,7 @@ public class TagEditor {
     modelObserverArrayList.add(observer);
   }
 
+  @SuppressWarnings("unused")
   public void removeObserver(ModelObserver observer) {
     modelObserverArrayList.remove(observer);
   }

@@ -32,7 +32,7 @@ public class AlbumImage implements FXComponent {
     if (tagEditor.mp3File != null) {
 
       byte[] imageData = tagEditor.getImage();
-      BufferedImage bufferedImage = null;
+      BufferedImage bufferedImage;
       try (ByteArrayInputStream bis = new ByteArrayInputStream(imageData)) {
         bufferedImage = ImageIO.read(bis);
       } catch (IOException e) {
@@ -68,7 +68,7 @@ public class AlbumImage implements FXComponent {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ImageIO.write(newBufferedImage, "png", baos);
                 byte[] imageBytes = baos.toByteArray();
-                tagEditor.setImage(imageBytes);
+                controller.setImage(imageBytes);
 
                 success = true;
                 break;

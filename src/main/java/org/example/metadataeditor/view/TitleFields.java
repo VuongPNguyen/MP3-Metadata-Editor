@@ -1,7 +1,6 @@
 package org.example.metadataeditor.view;
 
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -28,14 +27,10 @@ public class TitleFields implements FXComponent {
     TextField titleField = new TextField(tagEditor.getTitle());
     titleField.setPrefWidth(500);
     ChangeListener<Boolean> focusListener =
-        new ChangeListener<Boolean>() {
-          @Override
-          public void changed(
-              ObservableValue<? extends Boolean> observableValue, Boolean oldVal, Boolean newVal) {
-            if (titleField.getText() != null) {
-              if (!newVal) {
-                controller.setTitle(titleField.getText());
-              }
+        (_, _, newVal) -> {
+          if (titleField.getText() != null) {
+            if (!newVal) {
+              controller.setTitle(titleField.getText());
             }
           }
         };

@@ -6,10 +6,8 @@ import org.example.metadataeditor.controller.Controller;
 import org.example.metadataeditor.model.TagEditor;
 
 public class SongFields implements FXComponent {
-  private TagEditor tagEditor;
-  private Controller controller;
-
-  TitleFields titleFields;
+  private final TagEditor tagEditor;
+  private final Controller controller;
 
   public SongFields(TagEditor tagEditor, Controller controller) {
     this.tagEditor = tagEditor;

@@ -5,7 +5,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import javafx.scene.text.Text;
 import org.example.metadataeditor.controller.Controller;
 import org.example.metadataeditor.model.TagEditor;
 
