@@ -20,7 +20,7 @@ public class MiscFields implements FXComponent{
   @Override
   public Parent render() {
     HBox hBox = new HBox();
-    hBox.setStyle("-fx-alignment: center-left; -fx-font-size: 14; -fx-padding: 3;");
+    hBox.setStyle("-fx-alignment: center-left; -fx-padding: 3;");
 
     Label trackNumberLabel = new Label("Track: ");
 

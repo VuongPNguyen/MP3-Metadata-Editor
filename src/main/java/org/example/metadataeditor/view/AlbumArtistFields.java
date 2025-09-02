@@ -8,6 +8,8 @@ import javafx.scene.layout.VBox;
 import org.example.metadataeditor.controller.Controller;
 import org.example.metadataeditor.model.TagEditor;
 
+import static org.example.metadataeditor.view.ViewGlobals.ScreenWidth;
+
 public class AlbumArtistFields implements FXComponent {
   TagEditor tagEditor;
   Controller controller;
@@ -20,12 +22,12 @@ public class AlbumArtistFields implements FXComponent {
   @Override
   public Parent render() {
     VBox vBox = new VBox();
-    vBox.setStyle("-fx-alignment: center-left; -fx-font-size: 14; -fx-padding: 3;");
+    vBox.setStyle("-fx-alignment: center-left; -fx-padding: 3;");
 
     Label albumArtistLabel = new Label("Album Artist: ");
 
     TextField albumArtistField = new TextField(tagEditor.getAlbumArtist());
-    albumArtistField.setPrefWidth(500);
+    albumArtistField.setPrefWidth(ScreenWidth);
     ChangeListener<Boolean> focusListener =
         (_, _, newVal) -> {
           if (albumArtistField.getText() != null) {

@@ -20,12 +20,12 @@ public class TitleFields implements FXComponent {
   @Override
   public Parent render() {
     VBox vBox = new VBox();
-    vBox.setStyle("-fx-alignment: center-left; -fx-font-size: 14; -fx-padding: 3;");
+    vBox.setStyle("-fx-alignment: center-left; -fx-padding: 3;");
 
     Label titleLabel = new Label("Title: ");
 
     TextField titleField = new TextField(tagEditor.getTitle());
-    titleField.setPrefWidth(500);
+//    titleField.setPrefWidth(500);
     ChangeListener<Boolean> focusListener =
         (_, _, newVal) -> {
           if (titleField.getText() != null) {

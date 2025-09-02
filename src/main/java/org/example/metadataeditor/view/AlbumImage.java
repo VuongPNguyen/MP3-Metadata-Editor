@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -29,8 +30,7 @@ public class AlbumImage implements FXComponent {
   public Parent render() {
     VBox vBox = new VBox();
 
-    if (tagEditor.mp3File != null) {
-
+    if (tagEditor.getMp3File() != null) {
       byte[] imageData = tagEditor.getImage();
       BufferedImage bufferedImage;
       try (ByteArrayInputStream bis = new ByteArrayInputStream(imageData)) {
@@ -83,7 +83,14 @@ public class AlbumImage implements FXComponent {
       });
 
       vBox.getChildren().add(imageView);
+    } else {
+      Image image = new Image("placeholder.png");
+      ImageView imageView = new ImageView(image);
+      imageView.setFitHeight(100);
+      imageView.setFitWidth(100);
+      vBox.getChildren().add(imageView);
     }
+    vBox.setPadding(new Insets(5, 5, 10, 5));
     return vBox;
   }
 }

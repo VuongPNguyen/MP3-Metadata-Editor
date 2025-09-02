@@ -1,16 +1,18 @@
 package org.example.metadataeditor.model;
 
-import com.mpatric.mp3agic.ID3v24Tag;
 import com.mpatric.mp3agic.Mp3File;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import org.example.metadataeditor.model.FileHandler.PathType;
 
 public class TagEditor {
   private String filePath;
-  public Mp3File mp3File;
+  private Mp3File mp3File;
   
-  public FileHandler fileHandler;
+  private final FileHandler fileHandler;
+  private final ArtistMapper artistMapper;
   
   private final String sourceDirectory;
   private final String targetFolder;
@@ -25,18 +27,21 @@ public class TagEditor {
 
   public TagEditor(String filePath, FileHandler fileHandler) {
     this.fileHandler = fileHandler;
-    sourceDirectory = fileHandler.getPathString(FileHandler.PathType.SOURCE);
-    targetFolder = fileHandler.getPathString(FileHandler.PathType.TARGET);
-    
+    sourceDirectory = fileHandler.getPathString(PathType.SOURCE);
+    targetFolder = fileHandler.getPathString(PathType.TARGET);
+
+    artistMapper = new ArtistMapper(this.fileHandler.getAppDirectory());
+
+    // Tries to set mp3file to designated filepath.
     if (filePath == null) {
       this.filePath = null;
       mp3File = null;
     } else {
       this.filePath = filePath;
       try {
+        // Assigns mp3file and removes genre. (Genre is usually Music when downloaded)
         this.mp3File = new Mp3File(filePath);
-        ID3v24Tag id3v24Tag = (ID3v24Tag) this.mp3File.getId3v2Tag();
-        id3v24Tag.setGenreDescription("");
+        this.mp3File.getId3v2Tag().setGenreDescription("");
       } catch (Exception e) {
         throw new RuntimeException();
       }
@@ -45,6 +50,7 @@ public class TagEditor {
   }
 
   public void newFile(String filePath) {
+    // Does the same as the constructor.
     if (filePath == null) {
       this.filePath = null;
       mp3File = null;
@@ -52,6 +58,7 @@ public class TagEditor {
       this.filePath = filePath;
       try {
         this.mp3File = new Mp3File(filePath);
+        this.mp3File.getId3v2Tag().setGenreDescription("");
       } catch (Exception e) {
         throw new RuntimeException();
       }
@@ -59,28 +66,40 @@ public class TagEditor {
     notify(this);
   }
 
-  public void setDirectory(FileHandler.PathType pathType, String path) {
+  public Mp3File getMp3File() {
+    return mp3File;
+  }
+
+  public void setDirectory(PathType pathType, String path) {
     fileHandler.setDirectory(pathType, path);
     notify(this);
   }
 
-  public String getPathString(FileHandler.PathType pathType) {
+  public String getPathString(PathType pathType) {
     return fileHandler.getPathString(pathType);
   }
   
   @SuppressWarnings("ResultOfMethodCallIgnored")
   public void saveTags() {
-    StringBuilder tempFileName = new StringBuilder(filePath);
-    try {
-      File tempFile = new File(targetFolder);
-      if (!tempFile.exists()) {
-        tempFile.mkdir();
+    if (mp3File != null) {
+      // Creates string to save new mp3 file.
+      StringBuilder tempFileName = new StringBuilder(filePath);
+      try {
+        File tempFile = new File(targetFolder);
+        if (!tempFile.exists()) {
+          tempFile.mkdir();
+        }
+        // Replaces source directory of file to target directory.
+        if (Objects.equals(sourceDirectory, targetFolder)) {
+          tempFileName.insert(tempFileName.length() - 4, " (1)");
+        } else {
+          tempFileName.replace(0, sourceDirectory.length(), targetFolder);
+        }
+
+        mp3File.save(tempFileName.toString());
+      } catch (Exception e) {
+        throw new RuntimeException("Error saving updated tags.");
       }
-      tempFileName.insert(sourceDirectory.length(), "\\NewSong");
-      //      System.out.println(tempFileName.toString());
-      mp3File.save(tempFileName.toString());
-    } catch (Exception e) {
-      throw new RuntimeException("Error saving updated tags.");
     }
   }
 
@@ -88,11 +107,7 @@ public class TagEditor {
     if (filePath == null) {
       return "";
     }
-    if (mp3File.getId3v2Tag().getTitle() == null) {
-      return "";
-    } else {
-      return mp3File.getId3v2Tag().getTitle();
-    }
+    return Objects.requireNonNullElse(mp3File.getId3v2Tag().getTitle(), "");
   }
 
   public void setTitle(String title) {
@@ -106,11 +121,7 @@ public class TagEditor {
     if (filePath == null) {
       return "";
     }
-    if (mp3File.getId3v2Tag().getArtist() == null) {
-      return "";
-    } else {
-      return mp3File.getId3v2Tag().getArtist();
-    }
+    return Objects.requireNonNullElse(mp3File.getId3v2Tag().getArtist(), "");
   }
 
   public void setArtist(String artist) {
@@ -124,11 +135,7 @@ public class TagEditor {
     if (filePath == null) {
       return "";
     }
-    if (mp3File.getId3v2Tag().getAlbum() != null) {
-      return mp3File.getId3v2Tag().getAlbum();
-    } else {
-      return "";
-    }
+    return Objects.requireNonNullElse(mp3File.getId3v2Tag().getAlbum(), "");
   }
 
   public void setAlbum(String album) {
@@ -142,11 +149,7 @@ public class TagEditor {
     if (filePath == null) {
       return "";
     }
-    if (mp3File.getId3v2Tag().getAlbumArtist() == null) {
-      return "";
-    } else {
-      return mp3File.getId3v2Tag().getAlbumArtist();
-    }
+    return Objects.requireNonNullElse(mp3File.getId3v2Tag().getAlbumArtist(), "");
   }
 
   public void setAlbumArtist(String albumArtist) {
@@ -160,11 +163,7 @@ public class TagEditor {
     if (filePath == null) {
       return "";
     }
-    if (mp3File.getId3v2Tag().getTrack() == null) {
-      return "";
-    } else {
-      return mp3File.getId3v2Tag().getTrack();
-    }
+    return Objects.requireNonNullElse(mp3File.getId3v2Tag().getTrack(), "");
   }
 
   public void setTrackNumber(String number) {
@@ -177,11 +176,7 @@ public class TagEditor {
     if (filePath == null) {
       return "";
     }
-    if (mp3File.getId3v2Tag().getYear() == null) {
-      return "";
-    } else {
-      return mp3File.getId3v2Tag().getYear();
-    }
+    return Objects.requireNonNullElse(mp3File.getId3v2Tag().getYear(), "");
   }
 
   public void setYear(String year) {
@@ -195,11 +190,7 @@ public class TagEditor {
     if (filePath == null) {
       return "";
     }
-    if (mp3File.getId3v2Tag().getGenreDescription() == null) {
-      return "";
-    } else {
-      return mp3File.getId3v2Tag().getGenreDescription();
-    }
+    return Objects.requireNonNullElse(mp3File.getId3v2Tag().getGenreDescription(), "");
   }
 
   public void setGenre(String genre) {
@@ -213,11 +204,7 @@ public class TagEditor {
     if (filePath == null) {
       return null;
     }
-    if (mp3File.getId3v2Tag().getGenreDescription() == null) {
-      return null;
-    } else {
-      return mp3File.getId3v2Tag().getAlbumImage();
-    }
+    return Objects.requireNonNullElse(mp3File.getId3v2Tag().getAlbumImage(), null);
   }
 
   public void setImage(byte[] image) {
@@ -227,6 +214,8 @@ public class TagEditor {
   }
 
   public void updateTags(SongType songType) {
+    setArtist(replaceArtist(getArtist()));
+
     switch (songType) {
       case COVER -> {
         setAlbum(getArtist() + " Covers");
@@ -241,6 +230,14 @@ public class TagEditor {
     }
 
     notify(this);
+  }
+
+  public void setNewArtistMap(String originalName, String newName) {
+    artistMapper.setNewArtist(originalName, newName);
+  }
+
+  public String replaceArtist(String originalName) {
+    return artistMapper.replaceArtist(originalName);
   }
 
   public void notify(TagEditor tagEditor) {

@@ -18,11 +18,14 @@ public class SongFields implements FXComponent {
   public Parent render() {
     VBox vBox = new VBox();
 
-    vBox.getChildren().add(new TitleFields(tagEditor, controller).render());
-    vBox.getChildren().add(new ArtistFields(tagEditor, controller).render());
-    vBox.getChildren().add(new AlbumFields(tagEditor, controller).render());
-    vBox.getChildren().add(new AlbumArtistFields(tagEditor, controller).render());
-    vBox.getChildren().add(new MiscFields(tagEditor, controller).render());
+    vBox.getChildren()
+        .addAll(
+            new TitleFields(tagEditor, controller).render(),
+            new ArtistFields(tagEditor, controller).render(),
+            new AlbumFields(tagEditor, controller).render(),
+            new AlbumArtistFields(tagEditor, controller).render(),
+            new MiscFields(tagEditor, controller).render());
+
     return vBox;
   }
 }

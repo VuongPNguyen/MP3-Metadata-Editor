@@ -1,6 +1,7 @@
 package org.example.metadataeditor;
 
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.example.metadataeditor.controller.Controller;
 import org.example.metadataeditor.model.FileHandler;
@@ -23,8 +24,13 @@ public class Application extends javafx.application.Application {
 
     Scene scene = new Scene(view.render());
 
-    stage.setTitle("Metadata Editor");
+    stage.setTitle(
+        "Metadata Editor - "
+            + fileHandler.getPathString(FileHandler.PathType.SOURCE)
+            + " → "
+            + fileHandler.getPathString(FileHandler.PathType.TARGET));
     stage.setScene(scene);
+    stage.setWidth(Screen.getPrimary().getVisualBounds().getWidth() / 2.5);
     stage.show();
   }
 }

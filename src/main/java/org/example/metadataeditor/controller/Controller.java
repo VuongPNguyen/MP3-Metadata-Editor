@@ -33,9 +33,13 @@ public class Controller {
     tagEditor.setYear(year);
   }
 
-  public void setGenre(String genre) {tagEditor.setGenre(genre);}
+  public void setGenre(String genre) {
+    tagEditor.setGenre(genre);
+  }
 
-  public void setImage(byte[] image) {tagEditor.setImage(image);}
+  public void setImage(byte[] image) {
+    tagEditor.setImage(image);
+  }
 
   public void saveTags() {
     tagEditor.saveTags();
@@ -43,6 +47,10 @@ public class Controller {
 
   public void updateTags(TagEditor.SongType songType) {
     tagEditor.updateTags(songType);
+  }
+
+  public void setNewArtistMap(String originalName, String newName) {
+    tagEditor.setNewArtistMap(originalName, newName);
   }
 
   public void newFile(String filePath) {

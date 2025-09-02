@@ -1,5 +1,6 @@
 package org.example.metadataeditor.model;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -8,7 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FileHandler {
   private final Path appDirectory;
@@ -17,7 +19,7 @@ public class FileHandler {
   public FileHandler() {
     // Gets user home directory and concatenates a path for app.
     String userHomeDir = System.getProperty("user.home");
-    appDirectory = Paths.get(userHomeDir, "MP3-Metadata-Editor");
+    appDirectory = Path.of(userHomeDir, "MP3-Metadata-Editor");
 
     // Tries to create folder for app.
     try {
@@ -29,70 +31,46 @@ public class FileHandler {
     createPathDataFiles(appDirectory);
   }
 
+  public Path getAppDirectory() {
+    return appDirectory;
+  }
+
   public void createPathDataFiles(Path appDir) {
     // Create file to store source and target files.
     Path directoryDataFilePath = appDir.resolve(jsonName);
     boolean fileExists = false;
     if (Files.exists(directoryDataFilePath)) {
-      System.out.println("File already exists.");
+      System.out.println("userDirectoryDesignation.json already exists.");
       fileExists = true;
     } else {
       try {
         Files.createFile(directoryDataFilePath);
       } catch (IOException e) {
-        throw new RuntimeException("Exception whilst creating directoryDataFile.json");
+        throw new RuntimeException("Exception whilst creating " + jsonName);
       }
     }
 
     // Populate file if file is newly created.
     if (!fileExists) {
       String userHomeDirString = System.getProperty("user.home");
-      Path userHomeDir = Paths.get(userHomeDirString);
+      Path userHomeDir = Path.of(userHomeDirString);
       Path defaultSourceDir = userHomeDir.resolve("Downloads");
       Path defaultTargetDir = defaultSourceDir.resolve("newSong");
 
       // Create new object to insert into JSON.
-      UserDirectories userDirectories =
-          new UserDirectories(defaultSourceDir.toString(), defaultTargetDir.toString());
+      Map<String, Object> map = new HashMap<>();
+      map.put("source", defaultSourceDir.toString());
+      map.put("target", defaultTargetDir.toString());
+
       try {
         ObjectMapper objectMapper = new ObjectMapper();
         File userDirectoryFile = directoryDataFilePath.toFile();
-        objectMapper.writeValue(userDirectoryFile, userDirectories);
+
+        objectMapper.writerWithDefaultPrettyPrinter().writeValue(userDirectoryFile, map);
       } catch (IOException e) {
         throw new RuntimeException(
-            "Exception whilst writing default values to directoryDataFile.json");
+            "Exception whilst writing default values to " + jsonName);
       }
-    }
-  }
-
-  static class UserDirectories {
-    private String source;
-    private String target;
-
-    @SuppressWarnings("unused")
-    public UserDirectories() {}
-
-    public UserDirectories(String source, String target) {
-      this.source = source;
-      this.target = target;
-    }
-
-    public String getSource() {
-      return source;
-    }
-
-    @SuppressWarnings("unused")
-    public void setSource(String source) {
-      this.source = source;
-    }
-
-    public String getTarget() {
-      return target;
-    }
-
-    @SuppressWarnings("unused")
-    public void setTarget(String target) {
-      this.target = target;
     }
   }
 
@@ -107,20 +85,21 @@ public class FileHandler {
     Path directoryDataFilePath = appDirectory.resolve(jsonName);
     
     File file = directoryDataFilePath.toFile();
+
+    Map<String, Object> map;
     
-    UserDirectories userDirectories;
     try {
-      userDirectories = objectMapper.readValue(file, objectMapper.constructType(UserDirectories.class));
+      map = objectMapper.readValue(file, new TypeReference<>() {});
     } catch (IOException e) {
-      throw new RuntimeException("Error reading JSON file: userDirectoryDesignation");
+      throw new RuntimeException("Error reading JSON file: " + jsonName);
     }
     
     switch (pathType) {
       case SOURCE -> {
-        return userDirectories.getSource();
+        return map.get("source").toString();
       }
       case TARGET -> {
-        return userDirectories.getTarget();
+        return map.get("target").toString();
       }
     }
     return null;
@@ -144,7 +123,7 @@ public class FileHandler {
 
       objectMapper.writerWithDefaultPrettyPrinter().writeValue(jsonFile, rootNode);
     } catch (IOException e) {
-      throw new RuntimeException("Exception whilst reading json tree.");
+      throw new RuntimeException("Exception whilst writing to " + jsonName);
     }
   }
 }
