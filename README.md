@@ -1,4 +1,5 @@
 A personal program based on Mp3tag, which is designed for editing the metadata of MP3 files.
+You can download the .jar file here: [MetadataEditor](https://github.com/VuongPNguyen/MP3-Metadata-Editor/raw/refs/heads/master/out/artifacts/MetadataEditor_jar/MetadataEditor.jar)
 
 ## Functionality:
 - Editing title, artist, album, album artist, track number, year, and cover image metadata of mp3 files.
