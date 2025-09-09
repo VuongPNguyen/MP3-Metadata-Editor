@@ -14,8 +14,8 @@ public class TagEditor {
   private final FileHandler fileHandler;
   private final ArtistMapper artistMapper;
   
-  private final String sourceDirectory;
-  private final String targetFolder;
+  private String sourceDirectory;
+  private String targetFolder;
 
   private final List<ModelObserver> modelObserverArrayList = new ArrayList<>();
 
@@ -72,6 +72,8 @@ public class TagEditor {
 
   public void setDirectory(PathType pathType, String path) {
     fileHandler.setDirectory(pathType, path);
+    sourceDirectory = fileHandler.getPathString(PathType.SOURCE);
+    targetFolder = fileHandler.getPathString(PathType.TARGET);
     notify(this);
   }
 
