@@ -1,4 +1,4 @@
-A personal program based on Mp3tag, which is designed for editing the metadata of MP3 files.<br>
+A personal program based on Mp3tag, which is designed for editing the metadata of MP3 files.<br>The .jar file requires Java 24<br>
 You can download the .jar file here: [MetadataEditor](https://github.com/VuongPNguyen/MP3-Metadata-Editor/raw/refs/heads/master/out/artifacts/MetadataEditor_jar/MetadataEditor.jar)
 
 ## Functionality:
