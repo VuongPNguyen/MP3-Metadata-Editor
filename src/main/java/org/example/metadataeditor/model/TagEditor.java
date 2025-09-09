@@ -211,7 +211,7 @@ public class TagEditor {
 
   public void setImage(byte[] image) {
     if (mp3File != null) {
-      mp3File.getId3v2Tag().setAlbumImage(image, "album_img");
+      mp3File.getId3v2Tag().setAlbumImage(image, "image/jpeg");
     }
   }
 
