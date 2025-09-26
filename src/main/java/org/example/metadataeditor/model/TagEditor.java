@@ -13,9 +13,12 @@ public class TagEditor {
   
   private final FileHandler fileHandler;
   private final ArtistMapper artistMapper;
+  private final AlbumMapper albumMapper;
   
   private String sourceDirectory;
   private String targetFolder;
+
+  private SongType lastPressed = null;
 
   private final List<ModelObserver> modelObserverArrayList = new ArrayList<>();
 
@@ -31,6 +34,7 @@ public class TagEditor {
     targetFolder = fileHandler.getPathString(PathType.TARGET);
 
     artistMapper = new ArtistMapper(this.fileHandler.getAppDirectory());
+    albumMapper = new AlbumMapper(this.fileHandler.getAppDirectory());
 
     // Tries to set mp3file to designated filepath.
     if (filePath == null) {
@@ -50,6 +54,7 @@ public class TagEditor {
   }
 
   public void newFile(String filePath) {
+    lastPressed = null;
     // Does the same as the constructor.
     if (filePath == null) {
       this.filePath = null;
@@ -59,6 +64,12 @@ public class TagEditor {
       try {
         this.mp3File = new Mp3File(filePath);
         this.mp3File.getId3v2Tag().setGenreDescription("");
+
+        // If artist has an existing map (current artist != replaced artist) then change album artist and artist.
+        if (!getArtist().equals(replaceArtist(getArtist()))) {
+          setArtist(replaceArtist(getArtist()));
+          setAlbumArtist(replaceArtist(getArtist()));
+        }
       } catch (Exception e) {
         throw new RuntimeException();
       }
@@ -84,10 +95,11 @@ public class TagEditor {
   @SuppressWarnings("ResultOfMethodCallIgnored")
   public void saveTags() {
     if (mp3File != null) {
-      // Creates string to save new mp3 file.
+      // Creates stringBuilder for mp3 filePath + name.
       StringBuilder tempFileName = new StringBuilder(filePath);
       try {
         File tempFile = new File(targetFolder);
+        // Ensures that target directory exists, if not then makes one.
         if (!tempFile.exists()) {
           tempFile.mkdir();
         }
@@ -99,10 +111,19 @@ public class TagEditor {
         }
 
         mp3File.save(tempFileName.toString());
+
+        // Save successful, update album map if necessary.
+        if (lastPressed == SongType.ALBUM && !albumMapper.doesAlbumExist(getAlbumName())) {
+          Album a = new Album(getAlbumName(), getAlbumArtist(), getYear(), getGenre(), getAlbumImage());
+          albumMapper.addAlbumToList(a);
+        }
+
       } catch (Exception e) {
         throw new RuntimeException("Error saving updated tags.");
       }
     }
+
+    notify(this);
   }
 
   public String getTitle() {
@@ -133,17 +154,17 @@ public class TagEditor {
     }
   }
 
-  public String getAlbum() {
+  public String getAlbumName() {
     if (filePath == null) {
       return "";
     }
     return Objects.requireNonNullElse(mp3File.getId3v2Tag().getAlbum(), "");
   }
 
-  public void setAlbum(String album) {
+  public void setAlbumName(String album) {
     if (mp3File != null) {
       mp3File.getId3v2Tag().setAlbum(album);
-      System.out.println(getAlbum());
+      System.out.println(getAlbumName());
     }
   }
 
@@ -202,33 +223,39 @@ public class TagEditor {
     }
   }
 
-  public byte[] getImage() {
+  public byte[] getAlbumImage() {
     if (filePath == null) {
       return null;
     }
-    return Objects.requireNonNullElse(mp3File.getId3v2Tag().getAlbumImage(), null);
+    return mp3File.getId3v2Tag().getAlbumImage();
   }
 
-  public void setImage(byte[] image) {
+  public void setAlbumImage(byte[] image) {
     if (mp3File != null) {
       mp3File.getId3v2Tag().setAlbumImage(image, "image/jpeg");
     }
   }
 
   public void updateTags(SongType songType) {
-    setArtist(replaceArtist(getArtist()));
-
     switch (songType) {
       case COVER -> {
-        setAlbum(getArtist() + " Covers");
-        setAlbumArtist(getArtist());
+        lastPressed = SongType.COVER;
+        setAlbumName(getAlbumArtist() + " Covers");
       }
       case SINGLE -> {
-        setAlbum(getTitle());
-        setAlbumArtist(getArtist());
+        lastPressed = SongType.SINGLE;
+        setAlbumName(getTitle());
         setTrackNumber("1");
       }
-      case ALBUM -> setAlbumArtist(getArtist());
+      case ALBUM -> {
+        lastPressed = SongType.ALBUM;
+        if (albumMapper.doesAlbumExist(getAlbumName())) {
+          Album a = albumMapper.getAlbum(getAlbumName());
+          setYear(a.getYear());
+          setGenre(a.getGenre());
+          setAlbumImage(a.getAlbumImage());
+        }
+      }
     }
 
     notify(this);

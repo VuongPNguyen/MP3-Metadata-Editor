@@ -27,13 +27,13 @@ public class AlbumFields implements FXComponent {
 
     Label albumLabel = new Label("Album: ");
 
-    TextField albumField = new TextField(tagEditor.getAlbum());
+    TextField albumField = new TextField(tagEditor.getAlbumName());
     albumField.setPrefWidth(ScreenWidth);
     ChangeListener<Boolean> focusListener =
         (_, _, newVal) -> {
           if (albumField.getText() != null) {
             if (!newVal) {
-              controller.setAlbum(albumField.getText());
+              controller.setAlbumName(albumField.getText());
             }
           }
         };

@@ -17,8 +17,8 @@ public class Controller {
     tagEditor.setArtist(artist);
   }
 
-  public void setAlbum(String album) {
-    tagEditor.setAlbum(album);
+  public void setAlbumName(String album) {
+    tagEditor.setAlbumName(album);
   }
 
   public void setAlbumArtist(String albumArtist) {
@@ -37,8 +37,8 @@ public class Controller {
     tagEditor.setGenre(genre);
   }
 
-  public void setImage(byte[] image) {
-    tagEditor.setImage(image);
+  public void setAlbumImage(byte[] image) {
+    tagEditor.setAlbumImage(image);
   }
 
   public void saveTags() {

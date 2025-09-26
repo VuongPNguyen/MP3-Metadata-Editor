@@ -7,6 +7,7 @@ module org.example.metadataeditor {
   requires javafx.swing;
   requires java.desktop;
   requires com.fasterxml.jackson.databind;
+  requires com.fasterxml.jackson.core;
   opens org.example.metadataeditor.model to com.fasterxml.jackson.databind;
   
   opens org.example.metadataeditor to javafx.fxml;

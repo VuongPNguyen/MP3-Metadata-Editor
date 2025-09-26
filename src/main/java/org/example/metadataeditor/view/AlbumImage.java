@@ -31,15 +31,20 @@ public class AlbumImage implements FXComponent {
     VBox vBox = new VBox();
 
     if (tagEditor.getMp3File() != null) {
-      byte[] imageData = tagEditor.getImage();
-      BufferedImage bufferedImage;
-      try (ByteArrayInputStream bis = new ByteArrayInputStream(imageData)) {
-        bufferedImage = ImageIO.read(bis);
-      } catch (IOException e) {
-        throw new RuntimeException("Error reading image");
-      }
+      byte[] imageData = tagEditor.getAlbumImage();
+      Image image;
+      if (imageData == null) {
+        image = new Image("placeholder.png");
+      } else {
+        BufferedImage bufferedImage;
+        try (ByteArrayInputStream bis = new ByteArrayInputStream(imageData)) {
+          bufferedImage = ImageIO.read(bis);
+        } catch (IOException e) {
+          throw new RuntimeException("Error reading image");
+        }
 
-      Image image = SwingFXUtils.toFXImage(bufferedImage, null);
+        image = SwingFXUtils.toFXImage(bufferedImage, null);
+      }
       ImageView imageView = new ImageView(image);
       imageView.setFitHeight(100);
       imageView.setFitWidth(100);
@@ -68,7 +73,7 @@ public class AlbumImage implements FXComponent {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ImageIO.write(newBufferedImage, "png", baos);
                 byte[] imageBytes = baos.toByteArray();
-                controller.setImage(imageBytes);
+                controller.setAlbumImage(imageBytes);
 
                 success = true;
                 break;

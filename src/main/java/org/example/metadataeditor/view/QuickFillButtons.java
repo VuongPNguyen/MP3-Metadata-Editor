@@ -26,7 +26,12 @@ public class QuickFillButtons implements FXComponent {
     Button singleButton = new Button("Single");
     Button albumButton = new Button("Album");
 
-    Label artistLabel = new Label(tagEditor.getArtist());
+    Label artistLabel = new Label();
+    if (tagEditor.getAlbumArtist().isEmpty()) {
+      artistLabel.setText(tagEditor.getArtist());
+    } else {
+      artistLabel.setText(tagEditor.getAlbumArtist());
+    }
     artistLabel.setPrefWidth(120);
     artistLabel.setStyle(
         "-fx-border-color: lightgray; "
@@ -39,7 +44,11 @@ public class QuickFillButtons implements FXComponent {
     Label arrowLabel = new Label(" → ");
 
     TextField newArtistNameField = new TextField();
-    newArtistNameField.setPromptText(tagEditor.replaceArtist(tagEditor.getArtist()));
+    if (tagEditor.getAlbumArtist().isEmpty()) {
+      newArtistNameField.setPromptText(tagEditor.replaceArtist(tagEditor.getArtist()));
+    } else {
+      newArtistNameField.setPromptText(tagEditor.replaceArtist(tagEditor.getAlbumArtist()));
+    }
     newArtistNameField.setStyle("-fx-prompt-text-fill: #525252");
 
     // Button Actions

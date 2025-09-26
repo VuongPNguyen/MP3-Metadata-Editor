@@ -61,14 +61,14 @@ public class ArtistMapper {
 
       objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, rootNode);
 
-      resetMap();
+      updateMap();
 
     } catch (IOException e) {
       throw new RuntimeException("Exception whilst writing to " + jsonName);
     }
   }
 
-  public void resetMap() {
+  public void updateMap() {
     File file = artistFilePath.toFile();
     ObjectMapper objectMapper = new ObjectMapper();
     try {
