@@ -312,6 +312,7 @@ public class TagEditor {
         String albumName = getAlbum(FileType.NEW);
         if (albumMapper.doesAlbumExist(albumName)) {
           Album a = albumMapper.getAlbum(albumName);
+          setAlbumArtist(a.getAlbumArtist());
           setYear(a.getYear());
           setGenre(a.getGenre());
           setAlbumImage(a.getAlbumImage());
