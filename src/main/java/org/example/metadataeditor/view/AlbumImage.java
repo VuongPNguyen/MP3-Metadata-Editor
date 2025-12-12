@@ -33,8 +33,8 @@ public class AlbumImage implements FXComponent {
   @Override
   public Parent render() {
     VBox vBox = new VBox();
-    vBox.setPrefWidth(175);
-    vBox.setPrefHeight(175);
+    vBox.setPrefWidth(170);
+    vBox.setPrefHeight(170);
     vBox.setAlignment(Pos.CENTER_LEFT);
 
     if (tagEditor.getMp3(fileType) != null) {
@@ -58,7 +58,7 @@ public class AlbumImage implements FXComponent {
       vBox.getChildren().add(imageView);
     }
     
-    vBox.setStyle("-fx-padding: 5 5 10 5;");
+    vBox.setStyle("-fx-padding: 5 5 5 5;");
     return vBox;
   }
   

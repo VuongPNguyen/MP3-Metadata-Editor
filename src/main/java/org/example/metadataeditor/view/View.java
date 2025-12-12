@@ -4,6 +4,7 @@ import java.io.File;
 
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -93,6 +94,8 @@ public class View implements FXComponent, ModelObserver {
           songFields.render();
           controller.saveTags();
         });
+    VBox saveSection = new VBox(saveChangesButton);
+    saveSection.setAlignment(Pos.CENTER_RIGHT);
 
     Node appMenuBar = new AppMenuBar(tagEditor, controller, stage).render();
     
@@ -106,7 +109,7 @@ public class View implements FXComponent, ModelObserver {
             appMenuBar,
             new QuickFillButtons(tagEditor, controller).render(),
             songSideBySide,
-            saveChangesButton
+            saveSection
         );
 
     VBox.setMargin(appMenuBar, new Insets(0, 0, 10, 0));
