@@ -37,8 +37,8 @@ public class Controller {
     tagEditor.setGenre(genre);
   }
 
-  public void setImage(byte[] image) {
-    tagEditor.setImage(image);
+  public void setAlbumImage(byte[] image) {
+    tagEditor.setAlbumImage(image);
   }
 
   public void saveTags() {

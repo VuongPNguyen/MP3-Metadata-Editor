@@ -10,20 +10,20 @@ public class Label_TextboxStyle implements FXComponent {
   private final String value;
   private double width = 0;
   private boolean isVertical = true;
-  
+
   /** Title will have ":" added afterwards. */
   public Label_TextboxStyle(String labelTitle, String labelText) {
     title = labelTitle;
     value = labelText;
   }
-  
+
   public Label_TextboxStyle(String labelTitle, String labelText, double width, boolean isVertical) {
     title = labelTitle;
     value = labelText;
     this.width = width;
     this.isVertical = isVertical;
   }
-  
+
   @Override
   public Parent render() {
     Parent box;
@@ -32,11 +32,11 @@ public class Label_TextboxStyle implements FXComponent {
     } else {
       box = new HBox();
     }
-    
+
     box.setStyle("-fx-alignment: center-left; -fx-padding: 3;");
-    
+
     Label titleLabel = new Label(title + ": ");
-    
+
     Label valueLabel = new Label(value);
     valueLabel.setStyle(
         "-fx-border-color: lightgray; "
@@ -45,7 +45,7 @@ public class Label_TextboxStyle implements FXComponent {
             + "-fx-background-color: gainsboro; "
             + "-fx-padding: 3 3 3 5; "
             + "-fx-font-family: 'System'; ");
-    
+
     if (width > 0) {
       valueLabel.setPrefWidth(width);
     } else {
@@ -58,15 +58,19 @@ public class Label_TextboxStyle implements FXComponent {
                 }
               });
     }
-    
+
     if (isVertical) {
       assert box instanceof VBox;
-      ((VBox) box).getChildren().addAll(titleLabel, valueLabel);
+      ((VBox) box).getChildren().add(titleLabel);
+      ((VBox) box).getChildren().add(valueLabel);
     } else {
       assert box instanceof HBox;
-      ((HBox) box).getChildren().addAll(titleLabel, valueLabel);
+      if (title == null) {
+        ((HBox) box).getChildren().addAll(titleLabel);
+      }
+      ((HBox) box).getChildren().addAll(valueLabel);
     }
-    
+
     return box;
   }
 }

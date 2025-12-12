@@ -38,7 +38,7 @@ public class AlbumImage implements FXComponent {
     vBox.setAlignment(Pos.CENTER_LEFT);
 
     if (tagEditor.getMp3(fileType) != null) {
-      byte[] imageData = tagEditor.getImage(fileType);
+      byte[] imageData = tagEditor.getAlbumImage(fileType);
       BufferedImage bufferedImage;
       try (ByteArrayInputStream bis = new ByteArrayInputStream(imageData)) {
         bufferedImage = ImageIO.read(bis);
@@ -94,7 +94,7 @@ public class AlbumImage implements FXComponent {
               ByteArrayOutputStream baos = new ByteArrayOutputStream();
               ImageIO.write(newBufferedImage, "png", baos);
               byte[] imageBytes = baos.toByteArray();
-              controller.setImage(imageBytes);
+              controller.setAlbumImage(imageBytes);
 
               success = true;
               break;

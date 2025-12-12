@@ -14,6 +14,7 @@ public class TagEditor {
   
   private final FileHandler fileHandler;
   private final ArtistMapper artistMapper;
+  private final AlbumMapper albumMapper;
   
   private String sourceDirectory;
   private String targetFolder;
@@ -41,6 +42,7 @@ public class TagEditor {
     targetFolder = fileHandler.getPathString(PathType.TARGET);
 
     artistMapper = new ArtistMapper(this.fileHandler.getAppDirectory());
+    albumMapper = new AlbumMapper(this.fileHandler.getAppDirectory());
 
     // Tries to set mp3file to designated filepath.
     if (filePath == null) {
@@ -104,6 +106,7 @@ public class TagEditor {
       StringBuilder tempFileName = new StringBuilder(filePath);
       try {
         File tempFile = new File(targetFolder);
+        // Ensures that target directory exists, if not then makes one.
         if (!tempFile.exists()) {
           tempFile.mkdir();
         }
@@ -115,10 +118,24 @@ public class TagEditor {
         }
 
         newMp3.save(tempFileName.toString());
+        
+        // Save successful, update album map if necessary.
+        if (lastSelectedType == SongType.ALBUM && !albumMapper.doesAlbumExist(getAlbum(FileType.NEW))) {
+          Album a = new Album(
+              getAlbum(FileType.NEW),
+              getAlbumArtist(FileType.NEW),
+              getYear(FileType.NEW),
+              getGenre(FileType.NEW),
+              getAlbumImage(FileType.NEW)
+          );
+          albumMapper.addAlbumToList(a);
+        }
       } catch (Exception e) {
         throw new RuntimeException("Error saving updated tags.");
       }
     }
+
+    notify(this);
   }
   
   public String getTitle(FileType fileType) {
@@ -178,6 +195,7 @@ public class TagEditor {
       newMp3.getId3v2Tag().setAlbum(album);
       System.out.println("Set album: " + getAlbum(FileType.NEW));
     }
+    notify(this);
   }
 
   public String getAlbumArtist(FileType fileType) {
@@ -259,7 +277,7 @@ public class TagEditor {
     }
   }
 
-  public byte[] getImage(FileType fileType) {
+  public byte[] getAlbumImage(FileType fileType) {
     if (filePath == null) {
       return null;
     }
@@ -270,7 +288,7 @@ public class TagEditor {
     return null;
   }
 
-  public void setImage(byte[] image) {
+  public void setAlbumImage(byte[] image) {
     if (newMp3 != null) {
       newMp3.getId3v2Tag().setAlbumImage(image, "image/jpeg");
     }
@@ -290,7 +308,15 @@ public class TagEditor {
         setAlbumArtist(getArtist(FileType.NEW));
         setTrackNumber("1");
       }
-      case ALBUM -> setAlbumArtist(getArtist(FileType.NEW));
+      case ALBUM -> {
+        String albumName = getAlbum(FileType.NEW);
+        if (albumMapper.doesAlbumExist(albumName)) {
+          Album a = albumMapper.getAlbum(albumName);
+          setYear(a.getYear());
+          setGenre(a.getGenre());
+          setAlbumImage(a.getAlbumImage());
+        }
+      }
     }
 
     notify(this);
@@ -304,6 +330,8 @@ public class TagEditor {
     this.lastSelectedType = lastSelectedType;
   }
   
+  /* Artist Mapping Methods */
+  
   public void setNewArtistMap(String originalName, String newName) {
     artistMapper.setNewArtist(originalName, newName);
   }
@@ -311,6 +339,14 @@ public class TagEditor {
   public String replaceArtist(String originalName) {
     return artistMapper.replaceArtist(originalName);
   }
+  
+  /* Album Mapping Methods */
+  
+  public boolean doesAlbumExist(String albumName) {
+    return albumMapper.doesAlbumExist(albumName);
+  }
+  
+  /* MVC Methods */
 
   public void notify(TagEditor tagEditor) {
     for (ModelObserver m : modelObserverArrayList) {

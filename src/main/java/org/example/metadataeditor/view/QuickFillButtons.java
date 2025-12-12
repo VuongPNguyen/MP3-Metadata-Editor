@@ -1,13 +1,14 @@
 package org.example.metadataeditor.view;
 
+import java.util.Objects;
+
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import org.example.metadataeditor.controller.Controller;
 import org.example.metadataeditor.model.TagEditor;
-
-import java.util.Objects;
 
 public class QuickFillButtons implements FXComponent {
   private final TagEditor tagEditor;
@@ -23,14 +24,17 @@ public class QuickFillButtons implements FXComponent {
     // Radio Buttons
     final ToggleGroup tg = new ToggleGroup();
 
-    RadioButton coverButton = new RadioButton("Cover"); coverButton.setStyle("-fx-padding: 0 0 0 10;");
-    RadioButton singleButton = new RadioButton("Single"); singleButton.setStyle("-fx-padding: 0 0 0 10;");
-    RadioButton albumButton = new RadioButton("Album"); albumButton.setStyle("-fx-padding: 0 0 0 10;");
-    
+    RadioButton coverButton = new RadioButton("Cover");
+    coverButton.setStyle("-fx-padding: 0 0 0 10;");
+    RadioButton singleButton = new RadioButton("Single");
+    singleButton.setStyle("-fx-padding: 0 0 0 10;");
+    RadioButton albumButton = new RadioButton("Album");
+    albumButton.setStyle("-fx-padding: 0 10 0 10;");
+
     coverButton.setToggleGroup(tg);
     singleButton.setToggleGroup(tg);
     albumButton.setToggleGroup(tg);
-    
+
     switch (tagEditor.getLastSelectedType()) {
       case COVER -> coverButton.setSelected(true);
       case SINGLE -> singleButton.setSelected(true);
@@ -58,7 +62,7 @@ public class QuickFillButtons implements FXComponent {
                 }
               }
             });
-    
+
     // Artist Conversion
     Label artistLabel = new Label(tagEditor.getArtist(TagEditor.FileType.OLD));
     artistLabel.setPrefWidth(180);
@@ -66,29 +70,50 @@ public class QuickFillButtons implements FXComponent {
         "-fx-border-color: lightgray; "
             + "-fx-border-width: 1; "
             + "-fx-border-radius: 3; "
-            + "-fx-background-color: white; "
-            + "-fx-padding: 3; "
+            + "-fx-background-color: gainsboro ; "
+            + "-fx-padding: 3 3 3 5; "
             + "-fx-font-family: 'System'; ");
-    
+
     Label arrowLabel = new Label(" → ");
-    
+
     TextField newArtistNameField = new TextField();
-    newArtistNameField.setPromptText(tagEditor.replaceArtist(tagEditor.getArtist(TagEditor.FileType.OLD)));
+    newArtistNameField.setPromptText(
+        tagEditor.replaceArtist(tagEditor.getArtist(TagEditor.FileType.OLD)));
     newArtistNameField.setStyle("-fx-prompt-text-fill: #525252");
     newArtistNameField.setPrefWidth(180);
-    
+
     Button saveConversionButton = new Button("Save Conversion");
-    saveConversionButton.setOnAction(_ -> {
-      checkArtistToMap(artistLabel, newArtistNameField);
-      newArtistNameField.setText("");
-      newArtistNameField.setPromptText(tagEditor.replaceArtist(tagEditor.getArtist(TagEditor.FileType.OLD)));
-    });
+    saveConversionButton.setOnAction(
+        _ -> {
+          checkArtistToMap(artistLabel, newArtistNameField);
+          newArtistNameField.setText("");
+          newArtistNameField.setPromptText(
+              tagEditor.replaceArtist(tagEditor.getArtist(TagEditor.FileType.OLD)));
+        });
+
+    // Album Conversion
+    Button applyAlbumButton = new Button("Apply Album");
+    applyAlbumButton.setOnAction(
+        _ -> {
+          controller.setLastSelectedType(TagEditor.SongType.ALBUM);
+          controller.updateTags(TagEditor.SongType.ALBUM);
+        });
+    applyAlbumButton.setDisable(!tagEditor.doesAlbumExist(tagEditor.getAlbum(TagEditor.FileType.NEW)));
 
     HBox hBox = new HBox();
     hBox.setAlignment(Pos.CENTER_LEFT);
     hBox.getChildren()
         .addAll(
-            coverButton, singleButton, albumButton, artistLabel, arrowLabel, newArtistNameField, saveConversionButton);
+            coverButton,
+            singleButton,
+            albumButton,
+            artistLabel,
+            arrowLabel,
+            newArtistNameField,
+            saveConversionButton,
+            applyAlbumButton);
+
+    HBox.setMargin(applyAlbumButton, new Insets(0, 0, 0, 10));
 
     return hBox;
   }
