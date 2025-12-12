@@ -11,9 +11,6 @@ import org.example.metadataeditor.view.*;
 public class Application extends javafx.application.Application {
   @Override
   public void start(Stage stage) {
-    //    FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("hello-view.fxml"));
-    //    Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-    
     FileHandler fileHandler = new FileHandler();
 
     TagEditor tagEditor = new TagEditor(null, fileHandler);

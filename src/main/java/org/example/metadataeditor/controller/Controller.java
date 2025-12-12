@@ -3,7 +3,7 @@ package org.example.metadataeditor.controller;
 import org.example.metadataeditor.model.TagEditor;
 
 public class Controller {
-  TagEditor tagEditor;
+  final TagEditor tagEditor;
 
   public Controller(TagEditor tagEditor) {
     this.tagEditor = tagEditor;
@@ -55,5 +55,9 @@ public class Controller {
 
   public void newFile(String filePath) {
     tagEditor.newFile(filePath);
+  }
+  
+  public void setLastSelectedType(TagEditor.SongType songType) {
+    tagEditor.setLastSelectedType(songType);
   }
 }

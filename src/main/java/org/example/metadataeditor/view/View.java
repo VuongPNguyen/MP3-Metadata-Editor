@@ -9,6 +9,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -94,14 +95,17 @@ public class View implements FXComponent, ModelObserver {
         });
 
     Node appMenuBar = new AppMenuBar(tagEditor, controller, stage).render();
+    
+    OldSongView oldSongView = new OldSongView(tagEditor, controller);
+    
+    HBox songSideBySide = new HBox(oldSongView.render(), songFields.render());
 
     VBox vBox = new VBox();
     vBox.getChildren()
         .addAll(
             appMenuBar,
             new QuickFillButtons(tagEditor, controller).render(),
-            songFields.render(),
-            new AlbumImage(tagEditor, controller).render(),
+            songSideBySide,
             saveChangesButton
         );
 

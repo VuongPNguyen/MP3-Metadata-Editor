@@ -9,8 +9,8 @@ import org.example.metadataeditor.controller.Controller;
 import org.example.metadataeditor.model.TagEditor;
 
 public class MiscFields implements FXComponent{
-  TagEditor tagEditor;
-  Controller controller;
+  final TagEditor tagEditor;
+  final Controller controller;
 
   public MiscFields(TagEditor tagEditor, Controller controller) {
     this.tagEditor = tagEditor;
@@ -24,7 +24,7 @@ public class MiscFields implements FXComponent{
 
     Label trackNumberLabel = new Label("Track: ");
 
-    TextField trackNumberField = new TextField(tagEditor.getTrackNumber());
+    TextField trackNumberField = new TextField(tagEditor.getTrackNumber(TagEditor.FileType.NEW));
     trackNumberField.setPrefWidth(36);
     ChangeListener<Boolean> focusListener =
         (_, _, newVal) -> {
@@ -39,7 +39,7 @@ public class MiscFields implements FXComponent{
     Label yearLabel = new Label("Year: ");
     yearLabel.setStyle("-fx-padding: 0 0 0 10;");
 
-    TextField yearField = new TextField(tagEditor.getYear());
+    TextField yearField = new TextField(tagEditor.getYear(TagEditor.FileType.NEW));
     yearField.setPrefWidth(50);
     ChangeListener<Boolean> focusListener1 =
         (_, _, newVal) -> {
@@ -54,7 +54,7 @@ public class MiscFields implements FXComponent{
     Label genreLabel = new Label("Genre: ");
     genreLabel.setStyle("-fx-padding: 0 0 0 10;");
 
-    TextField genreField = new TextField(tagEditor.getGenre());
+    TextField genreField = new TextField(tagEditor.getGenre(TagEditor.FileType.NEW));
     genreField.setPrefWidth(120);
     ChangeListener<Boolean> focusListener2 =
         (_, _, newVal) -> {

@@ -42,11 +42,11 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.mpatric</groupId>
-            <artifactId>mp3agic</artifactId>
-            <version>0.9.1</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.mpatric</groupId>-->
+<!--            <artifactId>mp3agic</artifactId>-->
+<!--            <version>0.9.1</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>

@@ -9,7 +9,8 @@ import org.example.metadataeditor.model.FileHandler.PathType;
 
 public class TagEditor {
   private String filePath;
-  private Mp3File mp3File;
+  private Mp3File oldMp3;
+  private Mp3File newMp3;
   
   private final FileHandler fileHandler;
   private final ArtistMapper artistMapper;
@@ -19,11 +20,20 @@ public class TagEditor {
 
   private final List<ModelObserver> modelObserverArrayList = new ArrayList<>();
 
+  private SongType lastSelectedType = null;
+  
   public enum SongType {
     COVER,
     SINGLE,
     ALBUM
   }
+  
+  public enum FileType {
+    OLD,
+    NEW
+  }
+  
+  public boolean genreError = false;
 
   public TagEditor(String filePath, FileHandler fileHandler) {
     this.fileHandler = fileHandler;
@@ -35,13 +45,13 @@ public class TagEditor {
     // Tries to set mp3file to designated filepath.
     if (filePath == null) {
       this.filePath = null;
-      mp3File = null;
+      oldMp3 = null;
+      newMp3 = null;
     } else {
       this.filePath = filePath;
       try {
-        // Assigns mp3file and removes genre. (Genre is usually Music when downloaded)
-        this.mp3File = new Mp3File(filePath);
-        this.mp3File.getId3v2Tag().setGenreDescription("");
+        this.oldMp3 = new Mp3File(filePath);
+        this.newMp3 = new Mp3File(filePath);
       } catch (Exception e) {
         throw new RuntimeException();
       }
@@ -50,15 +60,17 @@ public class TagEditor {
   }
 
   public void newFile(String filePath) {
+    setLastSelectedType(null);
     // Does the same as the constructor.
     if (filePath == null) {
       this.filePath = null;
-      mp3File = null;
+      oldMp3 = null;
+      newMp3 = null;
     } else {
       this.filePath = filePath;
       try {
-        this.mp3File = new Mp3File(filePath);
-        this.mp3File.getId3v2Tag().setGenreDescription("");
+        this.oldMp3 = new Mp3File(filePath);
+        this.newMp3 = new Mp3File(filePath);
       } catch (Exception e) {
         throw new RuntimeException();
       }
@@ -66,8 +78,12 @@ public class TagEditor {
     notify(this);
   }
 
-  public Mp3File getMp3File() {
-    return mp3File;
+  public Mp3File getMp3(FileType fileType) {
+    switch (fileType) {
+      case NEW -> {return newMp3;}
+      case OLD -> {return oldMp3;}
+      case null, default -> {return null;}
+    }
   }
 
   public void setDirectory(PathType pathType, String path) {
@@ -83,7 +99,7 @@ public class TagEditor {
   
   @SuppressWarnings("ResultOfMethodCallIgnored")
   public void saveTags() {
-    if (mp3File != null) {
+    if (newMp3 != null) {
       // Creates string to save new mp3 file.
       StringBuilder tempFileName = new StringBuilder(filePath);
       try {
@@ -98,142 +114,196 @@ public class TagEditor {
           tempFileName.replace(0, sourceDirectory.length(), targetFolder);
         }
 
-        mp3File.save(tempFileName.toString());
+        newMp3.save(tempFileName.toString());
       } catch (Exception e) {
         throw new RuntimeException("Error saving updated tags.");
       }
     }
   }
-
-  public String getTitle() {
+  
+  public String getTitle(FileType fileType) {
     if (filePath == null) {
       return "";
     }
-    return Objects.requireNonNullElse(mp3File.getId3v2Tag().getTitle(), "");
+    switch (fileType) {
+      case OLD -> {return Objects.requireNonNullElse(oldMp3.getId3v2Tag().getTitle(), "");}
+      case NEW -> {return Objects.requireNonNullElse(newMp3.getId3v2Tag().getTitle(), "");}
+    }
+    return "";
   }
 
   public void setTitle(String title) {
-    if (mp3File != null) {
-      mp3File.getId3v2Tag().setTitle(title);
-      System.out.println(getTitle());
+    if (newMp3 != null) {
+      newMp3.getId3v2Tag().setTitle(title);
+      System.out.println("Set title: " + getTitle(FileType.NEW));
     }
+    if (lastSelectedType == SongType.SINGLE) {
+      setAlbum(title);
+    }
+    notify(this);
   }
 
-  public String getArtist() {
+  public String getArtist(FileType fileType) {
     if (filePath == null) {
       return "";
     }
-    return Objects.requireNonNullElse(mp3File.getId3v2Tag().getArtist(), "");
+    switch (fileType) {
+      case OLD -> {return Objects.requireNonNullElse(oldMp3.getId3v2Tag().getArtist(), "");}
+      case NEW -> {return Objects.requireNonNullElse(newMp3.getId3v2Tag().getArtist(), "");}
+    }
+    return "";
   }
 
   public void setArtist(String artist) {
-    if (mp3File != null) {
-      mp3File.getId3v2Tag().setArtist(artist);
-      System.out.println(getArtist());
+    if (newMp3 != null) {
+      newMp3.getId3v2Tag().setArtist(artist);
+      System.out.println("Set artist: " + getArtist(FileType.NEW));
+      notify(this);
     }
   }
 
-  public String getAlbum() {
+  public String getAlbum(FileType fileType) {
     if (filePath == null) {
       return "";
     }
-    return Objects.requireNonNullElse(mp3File.getId3v2Tag().getAlbum(), "");
+    switch (fileType) {
+      case OLD -> {return Objects.requireNonNullElse(oldMp3.getId3v2Tag().getAlbum(), "");}
+      case NEW -> {return Objects.requireNonNullElse(newMp3.getId3v2Tag().getAlbum(), "");}
+    }
+    return "";
   }
 
   public void setAlbum(String album) {
-    if (mp3File != null) {
-      mp3File.getId3v2Tag().setAlbum(album);
-      System.out.println(getAlbum());
+    if (newMp3 != null) {
+      newMp3.getId3v2Tag().setAlbum(album);
+      System.out.println("Set album: " + getAlbum(FileType.NEW));
     }
   }
 
-  public String getAlbumArtist() {
+  public String getAlbumArtist(FileType fileType) {
     if (filePath == null) {
       return "";
     }
-    return Objects.requireNonNullElse(mp3File.getId3v2Tag().getAlbumArtist(), "");
+    switch (fileType) {
+      case OLD -> {return Objects.requireNonNullElse(oldMp3.getId3v2Tag().getAlbumArtist(), "");}
+      case NEW -> {return Objects.requireNonNullElse(newMp3.getId3v2Tag().getAlbumArtist(), "");}
+    }
+    return "";
   }
 
   public void setAlbumArtist(String albumArtist) {
-    if (mp3File != null) {
-      mp3File.getId3v2Tag().setAlbumArtist(albumArtist);
-      System.out.println(getAlbumArtist());
+    if (newMp3 != null) {
+      newMp3.getId3v2Tag().setAlbumArtist(albumArtist);
+      System.out.println("Set album artist: " + getAlbumArtist(FileType.NEW));
     }
   }
 
-  public String getTrackNumber() {
+  public String getTrackNumber(FileType fileType) {
     if (filePath == null) {
       return "";
     }
-    return Objects.requireNonNullElse(mp3File.getId3v2Tag().getTrack(), "");
+    switch (fileType) {
+      case OLD -> {return Objects.requireNonNullElse(oldMp3.getId3v2Tag().getTrack(), "");}
+      case NEW -> {return Objects.requireNonNullElse(newMp3.getId3v2Tag().getTrack(), "");}
+    }
+    return "";
   }
 
   public void setTrackNumber(String number) {
-    if (mp3File != null) {
-      mp3File.getId3v2Tag().setTrack(number);
+    if (newMp3 != null) {
+      newMp3.getId3v2Tag().setTrack(number);
     }
   }
 
-  public String getYear() {
+  public String getYear(FileType fileType) {
     if (filePath == null) {
       return "";
     }
-    return Objects.requireNonNullElse(mp3File.getId3v2Tag().getYear(), "");
+    switch (fileType) {
+      case OLD -> {return Objects.requireNonNullElse(oldMp3.getId3v2Tag().getYear(), "");}
+      case NEW -> {return Objects.requireNonNullElse(newMp3.getId3v2Tag().getYear(), "");}
+    }
+    return "";
   }
 
   public void setYear(String year) {
-    if (mp3File != null) {
-      mp3File.getId3v2Tag().setYear(year);
-      System.out.println(getYear());
+    if (newMp3 != null) {
+      newMp3.getId3v2Tag().setYear(year);
+      System.out.println("Set year: " + getYear(FileType.NEW));
     }
   }
 
-  public String getGenre() {
+  public String getGenre(FileType fileType) {
     if (filePath == null) {
       return "";
     }
-    return Objects.requireNonNullElse(mp3File.getId3v2Tag().getGenreDescription(), "");
+    switch (fileType) {
+      case OLD -> {return Objects.requireNonNullElse(oldMp3.getId3v2Tag().getGenreDescription(), "");}
+      case NEW -> {return Objects.requireNonNullElse(newMp3.getId3v2Tag().getGenreDescription(), "");}
+    }
+    return "";
   }
 
   public void setGenre(String genre) {
-    if (mp3File != null) {
-      mp3File.getId3v2Tag().setGenreDescription(genre);
-      System.out.println(getGenre());
+    if (newMp3 != null) {
+      try {
+        newMp3.getId3v2Tag().setGenreDescription(genre);
+        System.out.println("Set genre: " + getGenre(FileType.NEW));
+      } catch (IllegalArgumentException e) {
+        System.out.println("Genre is not valid");
+        genreError = true;
+        notify(this);
+      } finally {
+        genreError = true;
+      }
     }
   }
 
-  public byte[] getImage() {
+  public byte[] getImage(FileType fileType) {
     if (filePath == null) {
       return null;
     }
-    return Objects.requireNonNullElse(mp3File.getId3v2Tag().getAlbumImage(), null);
+    switch (fileType) {
+      case OLD -> {return Objects.requireNonNullElse(oldMp3.getId3v2Tag().getAlbumImage(), null);}
+      case NEW -> {return Objects.requireNonNullElse(newMp3.getId3v2Tag().getAlbumImage(), null);}
+    }
+    return null;
   }
 
   public void setImage(byte[] image) {
-    if (mp3File != null) {
-      mp3File.getId3v2Tag().setAlbumImage(image, "image/jpeg");
+    if (newMp3 != null) {
+      newMp3.getId3v2Tag().setAlbumImage(image, "image/jpeg");
     }
   }
 
   public void updateTags(SongType songType) {
-    setArtist(replaceArtist(getArtist()));
+    System.out.println("Setting to " + songType.name() + ":");
+    setArtist(replaceArtist(getArtist(FileType.OLD)));
 
     switch (songType) {
       case COVER -> {
-        setAlbum(getArtist() + " Covers");
-        setAlbumArtist(getArtist());
+        setAlbum(getArtist(FileType.NEW) + " Covers");
+        setAlbumArtist(getArtist(FileType.NEW));
       }
       case SINGLE -> {
-        setAlbum(getTitle());
-        setAlbumArtist(getArtist());
+        setAlbum(getTitle(FileType.NEW));
+        setAlbumArtist(getArtist(FileType.NEW));
         setTrackNumber("1");
       }
-      case ALBUM -> setAlbumArtist(getArtist());
+      case ALBUM -> setAlbumArtist(getArtist(FileType.NEW));
     }
 
     notify(this);
   }
-
+  
+  public SongType getLastSelectedType() {
+    return lastSelectedType;
+  }
+  
+  public void setLastSelectedType(SongType lastSelectedType) {
+    this.lastSelectedType = lastSelectedType;
+  }
+  
   public void setNewArtistMap(String originalName, String newName) {
     artistMapper.setNewArtist(originalName, newName);
   }

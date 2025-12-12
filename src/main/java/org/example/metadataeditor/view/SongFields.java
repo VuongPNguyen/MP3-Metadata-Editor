@@ -24,7 +24,9 @@ public class SongFields implements FXComponent {
             new ArtistFields(tagEditor, controller).render(),
             new AlbumFields(tagEditor, controller).render(),
             new AlbumArtistFields(tagEditor, controller).render(),
-            new MiscFields(tagEditor, controller).render());
+            new MiscFields(tagEditor, controller).render(),
+            new AlbumImage(tagEditor, controller, TagEditor.FileType.NEW).render()
+          );
 
     return vBox;
   }

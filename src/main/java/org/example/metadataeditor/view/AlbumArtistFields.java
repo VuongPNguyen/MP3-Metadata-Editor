@@ -8,11 +8,9 @@ import javafx.scene.layout.VBox;
 import org.example.metadataeditor.controller.Controller;
 import org.example.metadataeditor.model.TagEditor;
 
-import static org.example.metadataeditor.view.ViewGlobals.ScreenWidth;
-
 public class AlbumArtistFields implements FXComponent {
-  TagEditor tagEditor;
-  Controller controller;
+  final TagEditor tagEditor;
+  final Controller controller;
 
   public AlbumArtistFields(TagEditor tagEditor, Controller controller) {
     this.tagEditor = tagEditor;
@@ -26,8 +24,7 @@ public class AlbumArtistFields implements FXComponent {
 
     Label albumArtistLabel = new Label("Album Artist: ");
 
-    TextField albumArtistField = new TextField(tagEditor.getAlbumArtist());
-    albumArtistField.setPrefWidth(ScreenWidth);
+    TextField albumArtistField = new TextField(tagEditor.getAlbumArtist(TagEditor.FileType.NEW));
     ChangeListener<Boolean> focusListener =
         (_, _, newVal) -> {
           if (albumArtistField.getText() != null) {

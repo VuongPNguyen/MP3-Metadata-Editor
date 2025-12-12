@@ -9,8 +9,8 @@ import org.example.metadataeditor.controller.Controller;
 import org.example.metadataeditor.model.TagEditor;
 
 public class TitleFields implements FXComponent {
-  TagEditor tagEditor;
-  Controller controller;
+  final TagEditor tagEditor;
+  final Controller controller;
 
   public TitleFields(TagEditor tagEditor, Controller controller) {
     this.tagEditor = tagEditor;
@@ -24,8 +24,7 @@ public class TitleFields implements FXComponent {
 
     Label titleLabel = new Label("Title: ");
 
-    TextField titleField = new TextField(tagEditor.getTitle());
-//    titleField.setPrefWidth(500);
+    TextField titleField = new TextField(tagEditor.getTitle(TagEditor.FileType.NEW));
     ChangeListener<Boolean> focusListener =
         (_, _, newVal) -> {
           if (titleField.getText() != null) {
@@ -35,9 +34,14 @@ public class TitleFields implements FXComponent {
           }
         };
     titleField.focusedProperty().addListener(focusListener);
-
-    vBox.getChildren().add(titleLabel);
-    vBox.getChildren().add(titleField);
+    
+    vBox.sceneProperty().addListener((obs, oldScene, newScene) -> {
+      if (newScene != null) {
+        titleField.prefWidthProperty().bind(newScene.widthProperty().divide(2));
+      }
+    });
+    
+    vBox.getChildren().addAll(titleLabel, titleField);
 
     return vBox;
   }
